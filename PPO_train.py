@@ -4,7 +4,7 @@ import time
 import torch
 
 from VRP_PPO_Model import Agentppo, Memory
-from creat_vrp import creat_data, reward, reward1
+from creat_vrp import creat_data, reward1
 from collections import OrderedDict
 from collections import namedtuple
 from itertools import product
@@ -173,8 +173,8 @@ def train():
         eps_clip=[0.2],
         timestep=[1],
         ppo_epoch=[3],
-        data_size=[512000],
-        valid_size=[10000]
+        data_size=[1000],
+        valid_size=[1000]
     )
     # 调用 RunBuilder.get_runs(params) 方法生成不同参数组合的列表 runs，每个元素是一个命名元组Run，包含了不同参数的取值组合
     runs = RunBuilder.get_runs(params)

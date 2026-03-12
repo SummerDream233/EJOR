@@ -54,8 +54,7 @@ def n_node():
     return 51  # 修改为你想要测试的节点数量
 
 
-def run_test(n_node=51):
-    """测试 VRP 模型。n_node 可选 21、51、101。"""
+def test(n_node):
     datas = []
 
     if n_node == 21 or n_node == 51 or n_node == 101:
@@ -63,6 +62,7 @@ def run_test(n_node=51):
         demand_ = np.loadtxt('./test_data/vrp{}_demand.csv'.format(n_node - 1), dtype=np.float, delimiter=',')
         capcity_ = np.loadtxt('./test_data/vrp{}_capcity.csv'.format(n_node - 1), dtype=np.float, delimiter=',')
         batch_size = 128
+        print(n_node)
     else:
         print('Please enter 21, 51 or 101')
         return
@@ -107,17 +107,7 @@ def run_test(n_node=51):
     print("代码运行时间：", execution_time, "秒")
 
 
-def test(n_node):
-    """pytest 入口：使用 fixture 的 n_node 调用 run_test。"""
-    run_test(n_node=n_node)
-
-
 if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser(description='VRP 模型测试')
-    parser.add_argument('--n_node', type=int, default=51, choices=[21, 51, 101],
-                        help='节点数量，可选 21 / 51 / 101（默认 51）')
-    args = parser.parse_args()
-    run_test(n_node=args.n_node)
+    test()
 
 
