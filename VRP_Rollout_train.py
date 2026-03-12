@@ -63,7 +63,7 @@ def train():
         hidden_node_dim=[128],
         hidden_edge_dim=[16],
         conv_laysers=[4],
-        data_size=[1000]
+        data_size=[100]
     )
     runs = RunBuilder.get_runs(params)
     # -------------------------------------------------------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ def train():
         print('lr', 'batch_size', 'hidden_node_dim', 'hidden_edge_dim', 'conv_laysers:', lr, batch_size,
               hidden_node_dim, hidden_edge_dim, conv_laysers)
         data_loder = creat_data(n_nodes, data_size, batch_size=batch_size)
-        valid_loder = creat_data(n_nodes, 1000, batch_size=batch_size)
+        valid_loder = creat_data(n_nodes, 100, batch_size=batch_size)
         print('Data creation completed')
 
         actor = Model(3, hidden_node_dim, 1, hidden_edge_dim, conv_laysers=conv_laysers).to(device)
@@ -88,7 +88,7 @@ def train():
         actor_optim = optim.Adam(actor.parameters(), lr=lr)
 
         costs = []
-        for epoch in range(100):
+        for epoch in range(2):
             print("epoch:", epoch, "------------------------------------------------")
             actor.train()
 
