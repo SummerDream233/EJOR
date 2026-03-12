@@ -1,3 +1,4 @@
+import datetime
 import numpy as np
 import torch
 from sklearn.preprocessing import MinMaxScaler
@@ -89,6 +90,8 @@ def creat_data(n_nodes, num_samples=10000, batch_size=32):
                     demand=torch.tensor(demand).unsqueeze(-1).float(),
                     capcity=torch.tensor(capcity).unsqueeze(-1).float())
         datas.append(data)
+        if (i + 1) % 50000 == 0:
+            print("Generated %d samples, current time: %s" % ((i + 1), datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
     # print(datas)
     dl = DataLoader(datas, batch_size=batch_size)
     return dl

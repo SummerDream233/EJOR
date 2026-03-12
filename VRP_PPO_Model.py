@@ -17,7 +17,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # device = torch.device('cpu')
 max_grad_norm = 2
 
-n_nodes = 21
+n_nodes = 51
 
 
 # device = torch.device('cpu')
@@ -333,6 +333,7 @@ class Decoder1(nn.Module):
                 if i == 0:
                     _input = encoder_inputs[:, 0, :]  # depot
 
+                # decoder_input = torch.cat([_input, dynamic_capacity], -1)
                 decoder_input = torch.cat([_input, dynamic_capacity], -1)
                 decoder_input = self.layer_norm1(decoder_input)
 

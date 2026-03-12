@@ -10,7 +10,7 @@ import pytest
 
 @pytest.fixture
 def n_node():
-    return 51
+    return 101
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -51,7 +51,7 @@ def evaliuate(valid_loder, n_node):
 
 @pytest.fixture
 def n_node():
-    return 51  # 修改为你想要测试的节点数量
+    return 101  # 修改为你想要测试的节点数量
 
 
 def test(n_node):

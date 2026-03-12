@@ -10,10 +10,11 @@ INIT = False
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # device = torch.device('cpu')
 max_grad_norm = 2
-n_nodes = 21
+n_nodes = 51
 
 
 # device = torch.device('cpu')
+
 
 
 class GatConv(MessagePassing):
