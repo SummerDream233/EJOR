@@ -60,7 +60,7 @@ def train():
 
     params = OrderedDict(
         lr=[1e-3],
-        batch_size=[512],
+        batch_size=[64],
         hidden_node_dim=[128],
         hidden_edge_dim=[16],
         conv_laysers=[4],
