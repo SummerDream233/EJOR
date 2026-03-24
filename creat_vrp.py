@@ -48,7 +48,8 @@ def creat_instance(num, n_nodes=100, random_seed=None):
         10: 2.,
         20: 3.,
         50: 4.,
-        100: 5.
+        100: 5.,
+        150: 6.
     }
     # 除去一个仓库节点其他节点的需求，值在(1-9)之间
     demand = np.random.randint(1, 10, size=(n_nodes-1))  # Demand, uniform integer 1 ... 9
