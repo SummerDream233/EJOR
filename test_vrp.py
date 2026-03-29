@@ -1,19 +1,23 @@
-import torch
+import argparse
 import os
-import numpy as np
-from torch_geometric.data import Data, DataLoader
-from creat_vrp import reward1, creat_instance
-from VRP_PPO_Model import Model
+import sys
 import time
-import pytest
 
+import numpy as np
+import torch
+from torch_geometric.data import Data, DataLoader
 
-@pytest.fixture
-def n_node():
-    return 101
-
+from creat_vrp import reward1
+from VRP_Actor import Model
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+# 权重放在 trained/{n_node}/actor.pt（与手动从 VRP_Rollout_train 保存结果复制至此的路径一致）
+TRAINED_FOLDER = 'trained'
+
+
+def trained_actor_path(n_node):
+    return os.path.join(TRAINED_FOLDER, str(n_node), 'actor.pt')
 
 
 def rollout(model, dataset, n_nodes):
@@ -21,25 +25,23 @@ def rollout(model, dataset, n_nodes):
 
     def eval_model_bat(bat):
         with torch.no_grad():
+            # VRP_Actor.Model: forward(datas, n_steps, greedy=False, T=1)
             cost, _ = model(bat, n_nodes * 2, True)
             cost = reward1(bat.x, cost.detach(), n_nodes)
         return cost.cpu()
-    totall_cost = torch.cat([eval_model_bat(bat.to(device))for bat in dataset], 0)
+
+    totall_cost = torch.cat([eval_model_bat(bat.to(device)) for bat in dataset], 0)
     return totall_cost
 
 
 def evaliuate(valid_loder, n_node):
-    folder = 'trained'
-
+    """从 trained/{n_node}/actor.pt 加载 VRP_Rollout_train 训练得到的权重（需为 VRP_Actor 结构）。"""
     agent = Model(3, 128, 1, 16, conv_laysers=4).to(device)
-    agent.to(device)
 
-    filepath = os.path.join(folder, '%s' % n_node)
+    path1 = trained_actor_path(n_node)
+    agent.load_state_dict(torch.load(path1, map_location=device))
+    print('Loaded:', path1)
 
-    if os.path.exists(filepath):
-        path1 = os.path.join(filepath, 'actor.pt')
-        agent.load_state_dict(torch.load(path1, device))
-    # 然后，调用rollout函数，传入agent模型和验证集valid_loder，以计算模型在验证集上的成本。计算的结果保存在cost变量中，并通过取均值来表示平均距离
     cost = rollout(agent, valid_loder, n_node)
     cost = cost.mean()
     print('Problem:TSP''%s' % n_node, '/ Average distance:', cost.item())
@@ -49,31 +51,26 @@ def evaliuate(valid_loder, n_node):
     return cost, cost1
 
 
-@pytest.fixture
-def n_node():
-    return 101  # 修改为你想要测试的节点数量
-
-
-def test(n_node):
+def run(n_node):
     datas = []
 
-    if n_node == 21 or n_node == 51 or n_node == 101:
+    if n_node == 21 or n_node == 51 or n_node == 101 or n_node == 151:
+        ckpt = trained_actor_path(n_node)
+        if not os.path.exists(ckpt):
+            print('Warning: checkpoint not found:', ckpt)
+            sys.exit(1)
         node_ = np.loadtxt('./test_data/vrp{}_test_data.csv'.format(n_node - 1), dtype=np.float, delimiter=',')
         demand_ = np.loadtxt('./test_data/vrp{}_demand.csv'.format(n_node - 1), dtype=np.float, delimiter=',')
         capcity_ = np.loadtxt('./test_data/vrp{}_capcity.csv'.format(n_node - 1), dtype=np.float, delimiter=',')
         batch_size = 128
         print(n_node)
     else:
-        print('Please enter 21, 51 or 101')
+        print('Please enter 21, 51, 101 or 151')
         return
     node_ = node_.reshape(-1, n_node, 2)
 
-    # Calculate the distance matrix
-
     def c_dist(x1, x2):
         return ((x1[0] - x2[0]) ** 2 + (x1[1] - x2[1]) ** 2) ** 0.5
-
-    # edges = torch.zeros(n_nodes,n_nodes)
 
     data_size = node_.shape[0]
 
@@ -98,7 +95,7 @@ def test(n_node):
                     capcity=torch.tensor(capcity_[i]).unsqueeze(-1).float())
         datas.append(data)
 
-    print('Data created')
+    print('Data Loaded')
     start_time = time.time()
     dl = DataLoader(datas, batch_size=batch_size)
     evaliuate(dl, n_node)
@@ -108,6 +105,8 @@ def test(n_node):
 
 
 if __name__ == '__main__':
-    test()
-
-
+    parser = argparse.ArgumentParser(description='VRP 评估（trained 目录下的 VRP_Actor 权重）')
+    parser.add_argument('--n_node', type=int, required=True, choices=[21, 51, 101, 151],
+                        help='节点数，需与 trained 子目录名及 test_data 一致')
+    args = parser.parse_args()
+    run(args.n_node)
