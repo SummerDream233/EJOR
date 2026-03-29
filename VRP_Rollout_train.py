@@ -17,7 +17,7 @@ from rolloutBaseline1 import RolloutBaseline
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 # device = torch.device('cpu')
-n_nodes = 21
+n_nodes = 151
 steps = n_nodes
 
 
@@ -60,11 +60,11 @@ def train():
 
     params = OrderedDict(
         lr=[1e-3],
-        batch_size=[64],
+        batch_size=[128],
         hidden_node_dim=[128],
         hidden_edge_dim=[16],
         conv_laysers=[4],
-        data_size=[100] #384000
+        data_size=[512000] #384000
     )
     runs = RunBuilder.get_runs(params)
     # -------------------------------------------------------------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ def train():
         actor_optim = optim.Adam(actor.parameters(), lr=lr)
 
         costs = []
-        for epoch in range(2):
+        for epoch in range(100):
             print("epoch:", epoch, "------------------------------------------------", "Current time:", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             actor.train()
 
