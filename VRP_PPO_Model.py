@@ -71,7 +71,9 @@ class GatConv(MessagePassing):
         x = torch.cat([x_i, x_j, edge_attr], dim=-1)
         alpha = self.attn(x)  # 注意力系数
         alpha = F.leaky_relu(alpha, self.negative_slope)  # 乘上一个小的负斜率（negative_slope）可以避免输出为0
-        alpha = softmax(alpha, edge_index_i, size_i)
+        # torch_geometric.utils.softmax(src, index, ptr=None, num_nodes=None, dim=0)
+        # size_i 是节点数（int），应传给 num_nodes，而不是 ptr
+        alpha = softmax(alpha, edge_index_i, num_nodes=size_i)
 
         # Sample attention coefficients stochastically.
         # 随机采样注意力系数
