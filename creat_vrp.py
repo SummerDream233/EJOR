@@ -97,6 +97,22 @@ def creat_data(n_nodes, num_samples=10000, batch_size=32):
     dl = DataLoader(datas, batch_size=batch_size)
     return dl
 
+def reward(static, tour_indices, n_nodes, batch_size):
+
+    static = static.reshape(-1, n_nodes, 2)
+    # print(static.shape)
+    static = static.transpose(2, 1)
+    tour_indices = tour_indices.reshape(batch_size, -1)
+    idx = tour_indices.unsqueeze(1).expand(-1, static.size(1), -1)
+    tour = torch.gather(static.data, 2, idx).permute(0, 2, 1)
+    # print(tour.shape)
+    # print(idx.shape)
+    y = torch.cat((tour, tour[:, :1]), dim=1)
+
+    tour_len = torch.sqrt(torch.sum(torch.pow(y[:, :-1] - y[:, 1:], 2), dim=2))
+    # print(tour_len.sum(1))
+    return tour_len.sum(1).detach()
+    
 def reward1(static, tour_indices, n_nodes):
     """
     这段代码定义了一个函数 reward1，接受三个参数：static、tour_indices 和 n_nodes。
