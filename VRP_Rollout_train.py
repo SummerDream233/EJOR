@@ -17,7 +17,7 @@ from rolloutBaseline1 import RolloutBaseline
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 # device = torch.device('cpu')
-n_nodes = 151
+n_nodes = 51
 steps = n_nodes
 
 
@@ -59,8 +59,8 @@ def train():
             return runs
 
     params = OrderedDict(
-        lr=[1e-3],
-        batch_size=[64],
+        lr=[3e-3],
+        batch_size=[128],
         hidden_node_dim=[128],
         hidden_edge_dim=[16],
         conv_laysers=[4],

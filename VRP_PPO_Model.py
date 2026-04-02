@@ -299,6 +299,7 @@ class Decoder1(nn.Module):
                     _input = encoder_inputs[:, 0, :]  # depot
 
                 decoder_input = torch.cat([_input, dynamic_capacity], -1)
+                decoder_input = self.fc(decoder_input) # new added
                 decoder_input = self.layer_norm1(decoder_input)
 
                 p = self.prob(decoder_input, encoder_inputs, mask)
